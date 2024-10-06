@@ -146,6 +146,7 @@ def feature_vector(feature_name, df):
     sim_matrix = np.array(Jaccard(df_feature))
     
     print(feature_name+" len is:"+ str(len(sim_matrix[0])))
+    sys.stdout.flush()
     return sim_matrix
 
 
@@ -503,6 +504,7 @@ def BERT_train(model,x_train,y_train,x_test,y_test,event_num,each_num_wei):
     len_test=len(y_test)
     print("arg train len", len(y_train))
     print("test len", len(y_test))
+    sys.stdout.flush()
 
     train_dataset = DDIDataset(x_train,np.array(y_train))
     test_dataset = DDIDataset(x_test,np.array(y_test))
@@ -549,6 +551,7 @@ def BERT_train(model,x_train,y_train,x_test,y_test,event_num,each_num_wei):
                 loss=my_loss(X, target, XC,XDC,inputs)
                 testing_loss += loss.item()
         print('epoch [%d] loss: %.6f testing_loss: %.6f ' % (epoch+1,running_loss/len_train,testing_loss/len_test))
+        sys.stdout.flush()
 
     pre_score=np.zeros((0, event_num), dtype=float)
     model.eval()        
@@ -592,8 +595,8 @@ def evaluate(pred_type, pred_score, y_test, event_num):
     result_all = np.zeros((all_eval_type, 1), dtype=float)
     each_eval_type = 6
     result_eve = np.zeros((event_num, each_eval_type), dtype=float)
-    y_one_hot = label_binarize(y_test, np.arange(event_num))
-    pred_one_hot = label_binarize(pred_type, np.arange(event_num))
+    y_one_hot = label_binarize(y_test, classes=np.arange(event_num))
+    pred_one_hot = label_binarize(pred_type, classes=np.arange(event_num))
 
     result_all[0] = accuracy_score(y_test, pred_type)
     result_all[1] = roc_aupr_score(y_one_hot, pred_score, average='micro')
@@ -640,6 +643,7 @@ def cross_val(feature,label,event_num,each_event_num):
     each_num_wei_dao_sum = sum(each_num_wei_dao)
     each_num_wei = [50*math.log(x / each_num_wei_dao_sum * 1000000) for x in each_num_wei_dao]
     print(each_num_wei)
+    sys.stdout.flush()
 
     for train_index, test_index in skf.split(feature, label):
         
@@ -649,6 +653,7 @@ def cross_val(feature,label,event_num,each_event_num):
         y_train, y_test = label[train_index], label[test_index]
         print("train len", len(y_train))
         print("test len", len(y_test))
+        sys.stdout.flush()
 
 
         
@@ -693,10 +698,13 @@ def main():
     np.random.shuffle(new_label)
 
     print("dataset len", len(new_feature))
+    sys.stdout.flush()
     
     start=time.time()
     result_all, result_eve=cross_val(new_feature,new_label,event_num,each_event_num)
     print("time used:", (time.time() - start) / 3600)
+    sys.stdout.flush()
+    
     save_result(file_path,"all",result_all)
     save_result(file_path,"each",result_eve)
 
@@ -709,19 +717,19 @@ def save_result(filepath,result_type,result):
             writer.writerow(i)
     return 0
 
-file_path="/home/dqw_wyj/conLea/"
+file_path="/data/dingli/mydata/MDDI-SCL/results/"
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-df_drug = pd.read_csv("/home/dqw_wyj/DDIMDL/drug_information_del_noDDIxiaoyu50.csv")
-extraction = pd.read_csv("/home/dqw_wyj/DDIMDL/df_extraction_cleanxiaoyu50.csv")
+df_drug = pd.read_csv("/data/dingli/mydata/MDDI-SCL/datasets/MDF-SA-DDI/drug_information_del_noDDIxiaoyu50.csv")
+extraction = pd.read_csv("/data/dingli/mydata/MDDI-SCL/datasets/MDF-SA-DDI/df_extraction_cleanxiaoyu50.csv")
 
 label_smoothing=0.3
 con_loss_T=0.05
 learn_rating=0.00002
 batch_size=512
-epo_num=120
+epo_num=3     # default 120
 epoch_changeloss=epo_num//3
 
 bert_n_heads=4
