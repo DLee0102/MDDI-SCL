@@ -632,6 +632,7 @@ def cross_val(feature,label,drugA,drugB,event_num,each_event_num):
     y_pred = np.array([])
 
     # cro val
+    # temp_drug: 每种interaction下有哪些drug
     temp_drug1 = [[] for i in range(event_num)]
     temp_drug2 = [[] for i in range(event_num)]
     for i in range(len(label)):

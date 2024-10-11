@@ -80,14 +80,23 @@ def prepare(df_drug, feature_list,mechanism,action,drugA,drugB):
         d_event.append(mechanism[i]+" "+action[i])
 
     count={}
+    # 打标签
     for i in d_event:
         if i in count:
             count[i]+=1
         else:
             count[i]=1
+    
+    # interaction的种类数
     event_num=len(count)
+    
+    # list1按照interaction的实体数量顺序排列
+    # list1 like [('A B', 100), ('C D', 50), ('E F', 30), ('G H', 20)]
     list1 = sorted(count.items(), key=lambda x: x[1],reverse=True)
     each_event_num=[]
+    
+    # d_label like {'A B': 0, 'C D': 1, 'E F': 2, 'G H': 3}，这步等于是把元组列表转换为字典，同时得到标签
+    # 同时得到每个interaction的数量
     for i in range(len(list1)):
         d_label[list1[i][0]]=i
         each_event_num.append(list1[i][1])
@@ -113,6 +122,8 @@ def prepare(df_drug, feature_list,mechanism,action,drugA,drugB):
     new_feature = np.array(new_feature) #323539*....
     new_label = np.array(new_label)  #323539
 
+    # new_feature like [[1,2,3,4,5,6,7,8,9,10],[11,12,13,14,15,16,17,18,19,20],...]
+    # 行数为三元组的数量，列数为特征的维度
     return new_feature, new_label,event_num,each_event_num
 
 
@@ -493,6 +504,7 @@ def BERT_train(model,x_train,y_train,x_test,y_test,event_num,each_num_wei):
     model=torch.nn.DataParallel(model)
     model=model.to(device)
 
+    # 反转x_train的每一对数据，又能得到一对新的数据，做了数据增强
     x_train=np.vstack((x_train,np.hstack((x_train[:,len(x_train[0])//2:],x_train[:,:len(x_train[0])//2]))))
     y_train = np.hstack((y_train, y_train))
     np.random.seed(seed)
@@ -723,6 +735,8 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 conn = sqlite3.connect("/data/dingli/mydata/MDDI-SCL/datasets/MDF-SA-DDI/event.db")
+
+# 多层次知识图谱数据集
 df_drug = pd.read_sql('select * from drug;', conn)
 extraction = pd.read_sql('select * from extraction;', conn)
 

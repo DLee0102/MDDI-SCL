@@ -767,7 +767,7 @@ label_smoothing=0.3
 con_loss_T=0.05
 learn_rating=0.00002
 batch_size=512
-epo_num=3    # default 120
+epo_num=120    # default 120
 epoch_changeloss=epo_num//3
 
 bert_n_heads=4

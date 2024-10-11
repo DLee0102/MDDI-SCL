@@ -717,7 +717,7 @@ def save_result(filepath,result_type,result):
             writer.writerow(i)
     return 0
 
-file_path="/data/dingli/mydata/MDDI-SCL/results/"
+file_path="/data/dingli/mydata/MDDI-SCL/results/task1_big/"
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -729,7 +729,7 @@ label_smoothing=0.3
 con_loss_T=0.05
 learn_rating=0.00002
 batch_size=512
-epo_num=3     # default 120
+epo_num=120     # default 120
 epoch_changeloss=epo_num//3
 
 bert_n_heads=4

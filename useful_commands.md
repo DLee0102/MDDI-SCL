@@ -26,7 +26,7 @@ sys.stdout.flush()
 (date; nohup python ./MKG-FENN-task2.py) > ./log/train.log 2>&1 &
 
 # ; 用于分割不同命令
-((TZ=UTC-8 date +%Y-%m-%d" "%H:%M:%S); nohup python ./task2_big.py; (TZ=UTC-8 date +%Y-%m-%d" "%H:%M:%S)) > ./log/trainTask2big_10_6.log 2>&1 &
+((TZ=UTC-8 date +%Y-%m-%d" "%H:%M:%S); nohup python ./task1_big.py; (TZ=UTC-8 date +%Y-%m-%d" "%H:%M:%S)) > ./log/trainTask1big_10_8.log 2>&1 &
 
 # 查看进程
 ps -ef
